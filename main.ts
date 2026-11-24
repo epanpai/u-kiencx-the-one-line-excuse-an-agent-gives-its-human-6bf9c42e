@@ -67,7 +67,11 @@ writeFileSync(target, LINE, 'utf8');
 
 // Read back and verify: the file the grader reads must be byte-for-byte
 // the line that passed the gate above — a partial or altered write must
-// fail loudly here instead of shipping a rejected entry.
-if (readFileSync(target, 'utf8') !== LINE) {
+// fail loudly here instead of shipping a rejected entry. Check bytes as
+// well as characters: the gate counts characters, but the leaderboard's
+// tie-break counts bytes, and the two agree only for pure ASCII — so
+// confirm the file is exactly 35 bytes, the size this entry claims.
+const written = readFileSync(target);
+if (written.toString('utf8') !== LINE || written.length !== Buffer.byteLength(LINE, 'utf8')) {
   throw new Error('entry.txt does not match the gated line');
 }
